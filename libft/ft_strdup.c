@@ -1,24 +1,31 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   sys_headers.h                                      :+:      :+:    :+:   */
+/*   ft_strdup.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ychng <ychng@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/10/28 20:00:56 by ychng             #+#    #+#             */
-/*   Updated: 2023/11/04 21:24:14 by ychng            ###   ########.fr       */
+/*   Created: 2023/11/05 17:21:54 by ychng             #+#    #+#             */
+/*   Updated: 2023/11/05 17:35:47 by ychng            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef SYS_HEADERS_H
-# define SYS_HEADERS_H
+#include "includes/libft.h"
 
-# include <stdio.h>
-# include <stdlib.h>
-# include <unistd.h>
-# include <fcntl.h>
-# include <sys/types.h>
-# include <sys/wait.h>
-# include <sys/stat.h>
+char	*ft_strdup(const char *str)
+{
+	size_t	len;
+	char	*new;
+	int		i;
 
-#endif
+	if (!str)
+		return (NULL);
+	len = ft_strlen(str);
+	new = malloc(sizeof(char) * (len + 1));
+	if (!new)
+		return (NULL);
+	i = -1;
+	while (++i <= len)
+		new[i] = str[i];
+	return (new);
+}

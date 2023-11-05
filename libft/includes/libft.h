@@ -18,6 +18,7 @@
 size_t	ft_strlen(const char *str);
 char	*ft_strchr(const char *str, int c);
 char	*ft_strtok(char *str, const char *delim);
+char	*ft_strdup(const char *str);
 char	*ft_strjoin(const char *s1, const char *s2, const char *delim);
 int		ft_strncmp(const char *s1, const char *s2, size_t n);
 char	**ft_split(const char *str, const char *delim);

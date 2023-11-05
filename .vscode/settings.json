@@ -1,5 +1,7 @@
 {
 	"files.associations": {
-		"pipex.h": "c"
+		"pipex.h": "c",
+		"fcntl.h": "c",
+		"stat.h": "c"
 	}
 }
