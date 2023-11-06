@@ -6,7 +6,7 @@
 /*   By: ychng <ychng@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/28 17:56:46 by ychng             #+#    #+#             */
-/*   Updated: 2023/10/29 15:42:30 by ychng            ###   ########.fr       */
+/*   Updated: 2023/11/06 12:53:09 by ychng            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ size_t	ft_strlen(const char *str)
 	size_t	len;
 
 	len = 0;
-	while (str[len])
+	while (str && str[len])
 		len++;
 	return (len);
 }
