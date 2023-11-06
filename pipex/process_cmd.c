@@ -6,7 +6,7 @@
 /*   By: ychng <ychng@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/04 19:04:04 by ychng             #+#    #+#             */
-/*   Updated: 2023/11/06 17:30:40 by ychng            ###   ########.fr       */
+/*   Updated: 2023/11/06 17:55:01 by ychng            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,7 +85,7 @@ static void	setup_file_fd(char *file_path, int *file_fd, bool read_only)
 	}
 	else
 	{
-		permission = (S_IRUSR | S_IWUSR | S_IRGRP |  S_IROTH);
+		permission = (S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 		*file_fd = open(file_path, O_WRONLY | O_CREAT | O_TRUNC, permission);
 	}
 }
@@ -99,7 +99,7 @@ static void	check_exit_status(int status, char *cmd_name)
 	}
 }
 
-static void execute_first_cmd(int file_fd, int *pipe_fd, char **cmd_tokens)
+static void	execute_first_cmd(int file_fd, int *pipe_fd, char **cmd_tokens)
 {
 	pid_t	pid;
 	int		status;
@@ -192,24 +192,24 @@ static size_t	count_argv(char **argv)
 	return (count);
 }
 
-static void	execute_cmd(int cmd_index, int *pipe_fd, char **argv, char **cmd_tokens)
+static void	execute_cmd(t_execute_cmd params)
 {
 	int		file_fd;
 
-	if (cmd_index == 2)
+	if (params.cmd_index == 2)
 	{
-		setup_file_fd(argv[1], &file_fd, true);
-		execute_first_cmd(file_fd, pipe_fd, cmd_tokens);
+		setup_file_fd(params.argv[1], &file_fd, true);
+		execute_first_cmd(file_fd, params.pipe_fd, params.cmd_tokens);
 		close(file_fd);
 	}
-	else if (cmd_index == (count_argv(argv) - 2))
+	else if (params.cmd_index == (count_argv(params.argv) - 2))
 	{
-		setup_file_fd(argv[cmd_index + 1], &file_fd, false);
-		execute_last_cmd(file_fd, pipe_fd, cmd_tokens);
+		setup_file_fd(params.argv[params.cmd_index + 1], &file_fd, false);
+		execute_last_cmd(file_fd, params.pipe_fd, params.cmd_tokens);
 		close(file_fd);
 	}
 	else
-		execute_cmd_in_between(pipe_fd, cmd_tokens);
+		execute_cmd_in_between(params.pipe_fd, params.cmd_tokens);
 }
 
 void	process_cmd(int argc, char **argv, char **envp)
@@ -223,6 +223,6 @@ void	process_cmd(int argc, char **argv, char **envp)
 	while (++cmd_index <= (argc - 2))
 	{
 		tokenize_cmd(argv[cmd_index], envp, &cmd_tokens);
-		execute_cmd(cmd_index, pipe_fd, argv, cmd_tokens);
+		execute_cmd((t_execute_cmd){cmd_index, pipe_fd, argv, cmd_tokens});
 	}
 }
