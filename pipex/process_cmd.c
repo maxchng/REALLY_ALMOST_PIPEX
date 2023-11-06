@@ -6,7 +6,7 @@
 /*   By: ychng <ychng@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/04 19:04:04 by ychng             #+#    #+#             */
-/*   Updated: 2023/11/06 13:07:06 by ychng            ###   ########.fr       */
+/*   Updated: 2023/11/06 14:52:40 by ychng            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ static char	*resolve_cmd_path(char *cmd_name, char **envp)
 		}
 	}
 	free(temp_envp);
-	return (NULL);
+	return (cmd_name);
 }
 
 static void	tokenize_cmd(char *cmd, char **envp, char ***cmd_tokens)
@@ -90,9 +90,19 @@ static void	setup_file_fd(char *file_path, int *file_fd, bool read_only)
 	}
 }
 
+static void	check_exit_status(int status, char *cmd_name)
+{
+	if (WEXITSTATUS(status) != 0)
+	{
+		write_error(cmd_name);
+		write_error(" command doesn't exist\n");
+	}
+}
+
 static void execute_first_cmd(int file_fd, int *pipe_fd, char **cmd_tokens)
 {
 	pid_t	pid;
+	int		status;
 
 	pid = fork();
 	if (pid < 0)
@@ -107,15 +117,17 @@ static void execute_first_cmd(int file_fd, int *pipe_fd, char **cmd_tokens)
 		close(pipe_fd[0]);
 		dup2(file_fd, STDIN_FILENO);
 		dup2(pipe_fd[1], STDOUT_FILENO);
-		execve(cmd_tokens[0], cmd_tokens, NULL);
-		exit(0);
+		if (execve(cmd_tokens[0], cmd_tokens, NULL) == -1)
+			exit(-1);
 	}
-	waitpid(pid, NULL, 0);
+	waitpid(pid, &status, 0);
+	check_exit_status(status, cmd_tokens[0]);
 }
 
 static void	execute_last_cmd(int file_fd, int *pipe_fd, char **cmd_tokens)
 {
 	pid_t	pid;
+	int		status;
 
 	pid = fork();
 	if (pid < 0)
@@ -130,18 +142,20 @@ static void	execute_last_cmd(int file_fd, int *pipe_fd, char **cmd_tokens)
 		close(pipe_fd[1]);
 		dup2(pipe_fd[0], STDIN_FILENO);
 		dup2(file_fd, STDOUT_FILENO);
-		execve(cmd_tokens[0], cmd_tokens, NULL);
-		exit(0);
+		if (execve(cmd_tokens[0], cmd_tokens, NULL) == -1)
+			exit(-1);
 	}
 	close(pipe_fd[0]);
 	close(pipe_fd[1]);
-	waitpid(pid, NULL, 0);
+	waitpid(pid, &status, 0);
+	check_exit_status(status, cmd_tokens[0]);
 }
 
 static void	execute_cmd_in_between(int *pipe_fd, char **cmd_tokens)
 {
 	int		prev_pipe_fd[2];
 	pid_t	pid;
+	int		status;
 
 	prev_pipe_fd[0] = pipe_fd[0];
 	prev_pipe_fd[1] = pipe_fd[1];
@@ -159,12 +173,13 @@ static void	execute_cmd_in_between(int *pipe_fd, char **cmd_tokens)
 		dup2(prev_pipe_fd[0], STDIN_FILENO);
 		close(pipe_fd[0]);
 		dup2(pipe_fd[1], STDOUT_FILENO);
-		execve(cmd_tokens[0], cmd_tokens, NULL);
-		exit(0);
+		if (execve(cmd_tokens[0], cmd_tokens, NULL) == -1)
+			exit(-1);
 	}
 	close(prev_pipe_fd[0]);
 	close(prev_pipe_fd[1]);
-	waitpid(pid, NULL, 0);
+	waitpid(pid, &status, 0);
+	check_exit_status(status, cmd_tokens[0]);
 }
 
 static void	execute_cmd(int cmd_index, int argc, char **argv, char **cmd_tokens)
