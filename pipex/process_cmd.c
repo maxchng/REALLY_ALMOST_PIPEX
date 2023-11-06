@@ -6,7 +6,7 @@
 /*   By: ychng <ychng@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/04 19:04:04 by ychng             #+#    #+#             */
-/*   Updated: 2023/11/05 21:46:14 by ychng            ###   ########.fr       */
+/*   Updated: 2023/11/06 12:45:41 by ychng            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -175,7 +175,7 @@ static void	execute_cmd(int cmd_index, int argc, char **argv, char **cmd_tokens)
 	}
 	else if (cmd_index == (argc - 2))
 	{
-		setup_file_fd(argv[1], &file_fd, false);
+		setup_file_fd(argv[cmd_index + 1], &file_fd, false);
 		execute_last_cmd(file_fd, pipe_fd, cmd_tokens);
 		close(file_fd);
 	}
