@@ -6,7 +6,7 @@
 /*   By: ychng <ychng@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/04 19:04:04 by ychng             #+#    #+#             */
-/*   Updated: 2023/11/06 12:45:41 by ychng            ###   ########.fr       */
+/*   Updated: 2023/11/06 13:07:06 by ychng            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,17 +50,22 @@ static void	tokenize_cmd(char *cmd, char **envp, char ***cmd_tokens)
 	*cmd_tokens = ft_split(cmd, " ");
 	if (*cmd_tokens == NULL)
 	{
-		perror("ft_splt function didn't work.\n");
+		write_error("ft_split function didn't work\n");
 		exit(-1);
 	}
 	(*cmd_tokens)[0] = resolve_cmd_path((*cmd_tokens)[0], envp);
+	if ((*cmd_tokens)[0] == NULL)
+	{
+		write_error(cmd);
+		write_error(" command doesn't exist\n");
+	}
 }
 
 static void	setup_pipe_fd(int *pipe_fd)
 {
 	if (pipe(pipe_fd) == -1)
 	{
-		perror("pipe function didn't work.\n");
+		write_error("pipe function didn't work\n");
 		exit(-1);
 	}
 }
@@ -74,7 +79,7 @@ static void	setup_file_fd(char *file_path, int *file_fd, bool read_only)
 		*file_fd = open(file_path, O_RDONLY);
 		if (*file_fd == -1)
 		{
-			perror("stdin file doesn't exist.\n");
+			write_error("stdin file doesn't exist\n");
 			exit(-1);
 		}
 	}
@@ -92,8 +97,8 @@ static void execute_first_cmd(int file_fd, int *pipe_fd, char **cmd_tokens)
 	pid = fork();
 	if (pid < 0)
 	{
-		perror("fork function didn't work.\n");
-		perror("can't create child process.\n");
+		write_error("fork function didn't work in execute_first_cmd\n");
+		write_error("can't create child process\n");
 		close(file_fd);
 		exit(-1);
 	}
@@ -115,8 +120,8 @@ static void	execute_last_cmd(int file_fd, int *pipe_fd, char **cmd_tokens)
 	pid = fork();
 	if (pid < 0)
 	{
-		perror("fork function didn't work.\n");
-		perror("can't create child process.\n");
+		write_error("fork function didn't work in execute_last_cmd\n");
+		write_error("can't create child process\n");
 		close(file_fd);
 		exit(-1);
 	}
@@ -144,7 +149,8 @@ static void	execute_cmd_in_between(int *pipe_fd, char **cmd_tokens)
 	pid = fork();
 	if (pid < 0)
 	{
-		perror("fork function didn't work.\n");
+		write_error("fork function didn't work in execute_cmd_in_between\n");
+		write_error("can't create child process\n");
 		exit(-1);
 	}
 	if (pid == 0)

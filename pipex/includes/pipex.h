@@ -6,7 +6,7 @@
 /*   By: ychng <ychng@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/28 14:07:18 by ychng             #+#    #+#             */
-/*   Updated: 2023/11/04 19:03:56 by ychng            ###   ########.fr       */
+/*   Updated: 2023/11/06 12:57:19 by ychng            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 # include "sys_headers.h"
 # include "libft.h"
 
+void	write_error(char *msg);
 void	process_cmd(int argc, char **argv, char **envp);
 
 #endif
