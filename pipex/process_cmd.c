@@ -6,15 +6,32 @@
 /*   By: ychng <ychng@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/04 19:04:04 by ychng             #+#    #+#             */
-/*   Updated: 2023/11/06 17:55:01 by ychng            ###   ########.fr       */
+/*   Updated: 2023/11/06 22:16:16 by ychng            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "includes/pipex.h"
 
 // No need to explicitly check the return value of ft_strjoin for NULL, 
-// because in case of failure, it will return NULL and we handle it 
-// in the following if statement.
+// because in case of failure, it will skip the following if statement
+// and return NULL.
+static char	*check_cmd_in_dir(char *cmd_name, char *dir_path)
+{
+	char	*cmd_path;
+
+	cmd_path = ft_strjoin(dir_path, cmd_name, "/");
+	if (access(cmd_path, F_OK) == 0)
+	{
+		return (cmd_path);
+	}
+	free(cmd_path);
+	return (NULL);
+}
+
+// This function resolves the command path using the PATH environment variable.
+// It iterates through the environment variables, to find the command.
+// If found, it returns the full command path; 
+// otherwise, it returns the original command name.
 static char	*resolve_cmd_path(char *cmd_name, char **envp)
 {
 	int		i;
@@ -31,17 +48,16 @@ static char	*resolve_cmd_path(char *cmd_name, char **envp)
 		dir_path = ft_strtok(temp_envp, ":");
 		while (dir_path != NULL)
 		{
-			cmd_path = ft_strjoin(dir_path, cmd_name, "/");
-			if (access(cmd_path, F_OK) == 0)
+			cmd_path = check_cmd_in_dir(cmd_name, dir_path);
+			if (cmd_path != NULL)
 			{
-				free(cmd_name);
 				free(temp_envp);
 				return (cmd_path);
 			}
 			dir_path = ft_strtok(NULL, ":");
 		}
+		free(temp_envp);
 	}
-	free(temp_envp);
 	return (cmd_name);
 }
 
@@ -108,7 +124,6 @@ static void	execute_first_cmd(int file_fd, int *pipe_fd, char **cmd_tokens)
 	if (pid < 0)
 	{
 		write_error("fork function didn't work in execute_first_cmd\n");
-		write_error("can't create child process\n");
 		close(file_fd);
 		exit(-1);
 	}
@@ -133,7 +148,6 @@ static void	execute_last_cmd(int file_fd, int *pipe_fd, char **cmd_tokens)
 	if (pid < 0)
 	{
 		write_error("fork function didn't work in execute_last_cmd\n");
-		write_error("can't create child process\n");
 		close(file_fd);
 		exit(-1);
 	}
@@ -151,20 +165,24 @@ static void	execute_last_cmd(int file_fd, int *pipe_fd, char **cmd_tokens)
 	check_exit_status(status, cmd_tokens[0]);
 }
 
+static void	copy_pipe_fd(int *pipe_fd, int *prev_pipe_fd)
+{
+	prev_pipe_fd[0] = pipe_fd[0];
+	prev_pipe_fd[1] = pipe_fd[1];
+}
+
 static void	execute_cmd_in_between(int *pipe_fd, char **cmd_tokens)
 {
 	int		prev_pipe_fd[2];
 	pid_t	pid;
 	int		status;
 
-	prev_pipe_fd[0] = pipe_fd[0];
-	prev_pipe_fd[1] = pipe_fd[1];
+	copy_pipe_fd(pipe_fd, prev_pipe_fd);
 	setup_pipe_fd(pipe_fd);
 	pid = fork();
 	if (pid < 0)
 	{
 		write_error("fork function didn't work in execute_cmd_in_between\n");
-		write_error("can't create child process\n");
 		exit(-1);
 	}
 	if (pid == 0)
