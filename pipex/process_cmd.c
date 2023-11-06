@@ -6,7 +6,7 @@
 /*   By: ychng <ychng@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/04 19:04:04 by ychng             #+#    #+#             */
-/*   Updated: 2023/11/06 14:52:40 by ychng            ###   ########.fr       */
+/*   Updated: 2023/11/06 17:30:40 by ychng            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -182,19 +182,27 @@ static void	execute_cmd_in_between(int *pipe_fd, char **cmd_tokens)
 	check_exit_status(status, cmd_tokens[0]);
 }
 
-static void	execute_cmd(int cmd_index, int argc, char **argv, char **cmd_tokens)
+static size_t	count_argv(char **argv)
 {
-	int		pipe_fd[2];
+	size_t	count;
+
+	count = 0;
+	while (argv[count] != NULL)
+		count++;
+	return (count);
+}
+
+static void	execute_cmd(int cmd_index, int *pipe_fd, char **argv, char **cmd_tokens)
+{
 	int		file_fd;
 
 	if (cmd_index == 2)
 	{
-		setup_pipe_fd(pipe_fd);
 		setup_file_fd(argv[1], &file_fd, true);
 		execute_first_cmd(file_fd, pipe_fd, cmd_tokens);
 		close(file_fd);
 	}
-	else if (cmd_index == (argc - 2))
+	else if (cmd_index == (count_argv(argv) - 2))
 	{
 		setup_file_fd(argv[cmd_index + 1], &file_fd, false);
 		execute_last_cmd(file_fd, pipe_fd, cmd_tokens);
@@ -207,12 +215,14 @@ static void	execute_cmd(int cmd_index, int argc, char **argv, char **cmd_tokens)
 void	process_cmd(int argc, char **argv, char **envp)
 {
 	int		cmd_index;
+	int		pipe_fd[2];
 	char	**cmd_tokens;
 
 	cmd_index = 1;
+	setup_pipe_fd(pipe_fd);
 	while (++cmd_index <= (argc - 2))
 	{
 		tokenize_cmd(argv[cmd_index], envp, &cmd_tokens);
-		execute_cmd(cmd_index, argc, argv, cmd_tokens);
+		execute_cmd(cmd_index, pipe_fd, argv, cmd_tokens);
 	}
 }
