@@ -6,7 +6,7 @@
 /*   By: ychng <ychng@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/04 19:04:04 by ychng             #+#    #+#             */
-/*   Updated: 2023/11/07 13:53:48 by ychng            ###   ########.fr       */
+/*   Updated: 2023/11/07 13:56:45 by ychng            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,7 +81,7 @@ static void	setup_pipe_fd(int *pipe_fd)
 	}
 }
 
-static void	setup_file_fd(char *file_path, int *file_fd, bool read_only)
+static int	setup_file_fd(char *file_path, int *file_fd, bool read_only)
 {
 	mode_t	permission;
 
@@ -91,7 +91,7 @@ static void	setup_file_fd(char *file_path, int *file_fd, bool read_only)
 		if (*file_fd == -1)
 		{
 			write_error("stdin file doesn't exist\n");
-			exit(-1);
+			return (-1);
 		}
 	}
 	else
@@ -99,6 +99,7 @@ static void	setup_file_fd(char *file_path, int *file_fd, bool read_only)
 		permission = (S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 		*file_fd = open(file_path, O_WRONLY | O_CREAT | O_TRUNC, permission);
 	}
+	return (0);
 }
 
 static void	check_exit_status(int status, char *cmd_name)
@@ -211,7 +212,8 @@ static void	execute_cmd(t_execute_cmd params)
 
 	if (params.cmd_index == 2)
 	{
-		setup_file_fd(params.argv[1], &file_fd, true);
+		if (setup_file_fd(params.argv[1], &file_fd, true) == -1)
+			return ;
 		execute_first_cmd(file_fd, params.pipe_fd, params.cmd_tokens);
 		close(file_fd);
 	}
