@@ -9,6 +9,7 @@ SRCS := ft_strlen.c \
 		ft_strtok.c \
 		ft_strdup.c \
 		ft_strjoin.c \
+		ft_strcmp.c \
 		ft_strncmp.c \
 		ft_split.c
 
