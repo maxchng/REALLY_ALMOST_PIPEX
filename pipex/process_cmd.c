@@ -6,7 +6,7 @@
 /*   By: ychng <ychng@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/04 19:04:04 by ychng             #+#    #+#             */
-/*   Updated: 2023/11/07 13:56:45 by ychng            ###   ########.fr       */
+/*   Updated: 2023/11/07 14:45:53 by ychng            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@ static char	*check_cmd_in_dir(char *cmd_name, char *dir_path)
 	cmd_path = ft_strjoin(dir_path, cmd_name, "/");
 	if (access(cmd_path, F_OK) == 0)
 	{
+		free(cmd_name);
 		return (cmd_path);
 	}
 	free(cmd_path);
@@ -227,6 +228,19 @@ static void	execute_cmd(t_execute_cmd params)
 		execute_cmd_in_between(params.pipe_fd, params.cmd_tokens);
 }
 
+static void	free_cmd_tokens(char **cmd_tokens)
+{
+	size_t	i;
+
+	i = 0;
+	while (cmd_tokens[i])
+	{
+		free(cmd_tokens[i]);
+		i++;
+	}
+	free(cmd_tokens);
+}
+
 void	process_cmd(int argc, char **argv, char **envp)
 {
 	int		cmd_index;
@@ -239,5 +253,6 @@ void	process_cmd(int argc, char **argv, char **envp)
 	{
 		tokenize_cmd(argv[cmd_index], envp, &cmd_tokens);
 		execute_cmd((t_execute_cmd){cmd_index, pipe_fd, argv, cmd_tokens});
+		free_cmd_tokens(cmd_tokens);
 	}
 }
