@@ -6,7 +6,7 @@
 /*   By: ychng <ychng@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/04 19:04:04 by ychng             #+#    #+#             */
-/*   Updated: 2023/11/06 22:16:16 by ychng            ###   ########.fr       */
+/*   Updated: 2023/11/07 13:53:48 by ychng            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,11 +70,6 @@ static void	tokenize_cmd(char *cmd, char **envp, char ***cmd_tokens)
 		exit(-1);
 	}
 	(*cmd_tokens)[0] = resolve_cmd_path((*cmd_tokens)[0], envp);
-	if ((*cmd_tokens)[0] == NULL)
-	{
-		write_error(cmd);
-		write_error(" command doesn't exist\n");
-	}
 }
 
 static void	setup_pipe_fd(int *pipe_fd)
