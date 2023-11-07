@@ -6,7 +6,7 @@
 /*   By: ychng <ychng@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/31 17:26:42 by ychng             #+#    #+#             */
-/*   Updated: 2023/11/08 06:32:33 by ychng            ###   ########.fr       */
+/*   Updated: 2023/11/08 06:44:52 by ychng            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ static size_t	count_word_len(const char *str, const char *delim)
 static void	insert_chars(char **split_str, const char *str, const char *delim)
 {
 	size_t	word_len;
-	char	**new_word;
+	char	*new_word;
 	size_t	i;
 
 	word_len = count_word_len(str, delim);
