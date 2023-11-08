@@ -6,7 +6,7 @@
 /*   By: ychng <ychng@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/04 19:04:04 by ychng             #+#    #+#             */
-/*   Updated: 2023/11/07 14:45:53 by ychng            ###   ########.fr       */
+/*   Updated: 2023/11/08 08:22:51 by ychng            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,8 +82,10 @@ static void	setup_pipe_fd(int *pipe_fd)
 	}
 }
 
-static int	setup_file_fd(char *file_path, int *file_fd, bool read_only)
+static int	setup_file_fd(char *file_path, int *file_fd,
+	t_execute_cmd params, bool read_only)
 {
+	int		mode;
 	mode_t	permission;
 
 	if (read_only == true)
@@ -97,8 +99,12 @@ static int	setup_file_fd(char *file_path, int *file_fd, bool read_only)
 	}
 	else
 	{
-		permission = (S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
-		*file_fd = open(file_path, O_WRONLY | O_CREAT | O_TRUNC, permission);
+		permission = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
+		if (ft_strcmp(params.argv[1], "here_doc") == 0)
+			mode = O_WRONLY | O_CREAT | O_APPEND;
+		else
+			mode = O_WRONLY | O_CREAT | O_TRUNC;
+		*file_fd = open(file_path, mode, permission);
 	}
 	return (0);
 }
@@ -207,23 +213,61 @@ static size_t	count_argv(char **argv)
 	return (count);
 }
 
-static void	execute_cmd(t_execute_cmd params)
+static void	setup_here_doc(char *delim, int *pipe_fd)
+{
+	char	*read_line;
+	int		len;
+
+	write(STDOUT_FILENO, "> ", ft_strlen("> "));
+	read_line = get_next_line(0);
+	while (read_line != NULL)
+	{
+		len = ft_strlen(read_line);
+		read_line[len - 1] = '\0';
+		if (ft_strncmp(read_line, delim, len) == 0)
+		{
+			free(read_line);
+			return ;
+		}
+		write(STDOUT_FILENO, "> ", ft_strlen("> "));
+		write(pipe_fd[1], read_line, len);
+		free(read_line);
+		read_line = get_next_line(0);
+	}
+}
+
+static void	handle_first_cmd(t_execute_cmd params)
 {
 	int		file_fd;
 
-	if (params.cmd_index == 2)
-	{
-		if (setup_file_fd(params.argv[1], &file_fd, true) == -1)
-			return ;
-		execute_first_cmd(file_fd, params.pipe_fd, params.cmd_tokens);
-		close(file_fd);
-	}
+	if (ft_strcmp(params.argv[1], "here_doc") == 0)
+		setup_here_doc(params.argv[2], params.pipe_fd);
+	else if (setup_file_fd(params.argv[1], &file_fd, params, true) == -1)
+		return ;
+	execute_first_cmd(file_fd, params.pipe_fd, params.cmd_tokens);
+	close(file_fd);
+}
+
+static void	handle_last_cmd(t_execute_cmd params)
+{
+	int	file_fd;
+
+	setup_file_fd(params.argv[params.cmd_index + 1], &file_fd, params, false);
+	execute_last_cmd(file_fd, params.pipe_fd, params.cmd_tokens);
+	close(file_fd);
+}
+
+static void	execute_cmd(t_execute_cmd params)
+{
+	size_t	first_cmd_index;
+
+	first_cmd_index = 2;
+	if (ft_strcmp(params.argv[1], "here_doc") == 0)
+		first_cmd_index++;
+	if (params.cmd_index == first_cmd_index)
+		handle_first_cmd(params);
 	else if (params.cmd_index == (count_argv(params.argv) - 2))
-	{
-		setup_file_fd(params.argv[params.cmd_index + 1], &file_fd, false);
-		execute_last_cmd(file_fd, params.pipe_fd, params.cmd_tokens);
-		close(file_fd);
-	}
+		handle_last_cmd(params);
 	else
 		execute_cmd_in_between(params.pipe_fd, params.cmd_tokens);
 }
@@ -248,6 +292,8 @@ void	process_cmd(int argc, char **argv, char **envp)
 	char	**cmd_tokens;
 
 	cmd_index = 1;
+	if (ft_strcmp(argv[1], "here_doc") == 0)
+		cmd_index++;
 	setup_pipe_fd(pipe_fd);
 	while (++cmd_index <= (argc - 2))
 	{
