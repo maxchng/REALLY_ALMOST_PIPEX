@@ -6,7 +6,7 @@
 /*   By: ychng <ychng@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/04 19:04:04 by ychng             #+#    #+#             */
-/*   Updated: 2023/11/08 08:22:51 by ychng            ###   ########.fr       */
+/*   Updated: 2023/11/08 21:31:43 by ychng            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -223,7 +223,6 @@ static void	setup_here_doc(char *delim, int *pipe_fd)
 	while (read_line != NULL)
 	{
 		len = ft_strlen(read_line);
-		read_line[len - 1] = '\0';
 		if (ft_strncmp(read_line, delim, len) == 0)
 		{
 			free(read_line);
@@ -238,14 +237,23 @@ static void	setup_here_doc(char *delim, int *pipe_fd)
 
 static void	handle_first_cmd(t_execute_cmd params)
 {
+	char	*delim;
 	int		file_fd;
 
 	if (ft_strcmp(params.argv[1], "here_doc") == 0)
-		setup_here_doc(params.argv[2], params.pipe_fd);
-	else if (setup_file_fd(params.argv[1], &file_fd, params, true) == -1)
-		return ;
-	execute_first_cmd(file_fd, params.pipe_fd, params.cmd_tokens);
-	close(file_fd);
+	{
+		delim = ft_strjoin(params.argv[2], "\n", NULL);
+		setup_here_doc(delim, params.pipe_fd);
+		free(delim);
+		execute_cmd_in_between(params.pipe_fd, params.cmd_tokens);
+	}
+	else
+	{
+		if (setup_file_fd(params.argv[1], &file_fd, params, true) == -1)
+			return ;
+		execute_first_cmd(file_fd, params.pipe_fd, params.cmd_tokens);
+		close(file_fd);
+	}
 }
 
 static void	handle_last_cmd(t_execute_cmd params)
