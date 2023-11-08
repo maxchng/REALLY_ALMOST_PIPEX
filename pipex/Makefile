@@ -5,7 +5,11 @@ NAME := pipex
 
 # Source files
 SRCS :=	pipex.c \
-		process_cmd.c
+		process_cmd.c \
+		setup_functions.c \
+		tokenize_cmd.c \
+		execute_cmd_1.c \
+		execute_cmd_2.c
 
 GNL_SRCS :=	get_next_line.c \
 			get_next_line_utils.c
