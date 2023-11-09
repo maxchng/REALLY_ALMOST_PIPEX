@@ -1,20 +1,21 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   pipex.h                                            :+:      :+:    :+:   */
+/*   pipex_bonus.h                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ychng <ychng@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/28 14:07:18 by ychng             #+#    #+#             */
-/*   Updated: 2023/11/09 17:01:07 by ychng            ###   ########.fr       */
+/*   Updated: 2023/11/09 16:58:57 by ychng            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef PIPEX_H
-# define PIPEX_H
+#ifndef PIPEX_BONUS_H
+# define PIPEX_BONUS_H
 
 # include "sys_headers.h"
 # include "libft.h"
+# include "get_next_line.h"
 
 typedef struct s_execute_cmd
 {
@@ -30,6 +31,7 @@ void	process_cmd(int argc, char **argv, char **envp);
 
 // setup_functions.c
 void	setup_pipe_fd(int *pipe_fd);
+void	setup_here_doc(char *delim, int *pipe_fd);
 int		setup_file_fd(char *file_path, int *file_fd,
 			t_execute_cmd params, bool read_only);
 

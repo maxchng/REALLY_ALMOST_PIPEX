@@ -6,11 +6,11 @@
 /*   By: ychng <ychng@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/08 22:17:14 by ychng             #+#    #+#             */
-/*   Updated: 2023/11/09 17:04:55 by ychng            ###   ########.fr       */
+/*   Updated: 2023/11/09 17:06:12 by ychng            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "includes/pipex.h"
+#include "../includes/pipex_bonus.h"
 
 static void	check_exit_status(int status, char *cmd_name)
 {

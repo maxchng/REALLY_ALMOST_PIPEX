@@ -6,11 +6,11 @@
 /*   By: ychng <ychng@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/08 22:13:00 by ychng             #+#    #+#             */
-/*   Updated: 2023/11/09 17:05:08 by ychng            ###   ########.fr       */
+/*   Updated: 2023/11/09 17:05:55 by ychng            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "includes/pipex.h"
+#include "../includes/pipex_bonus.h"
 
 // No need to explicitly check the return value of ft_strjoin for NULL, 
 // because in case of failure, it will skip the following if statement

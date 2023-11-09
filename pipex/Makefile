@@ -26,6 +26,7 @@ CFLAGS := -Wall -Werror -Wextra
 SYS_HEADERS_PATH := ../
 LIBFT_PATH := ../libft/
 OBJS_PATH := ./objs/
+BONUS_PATH := ./bonus/
 GNL_PATH := ../gnl/
 GNL_OBJS_PATH := ../gnl/objs/
 
@@ -53,8 +54,15 @@ $(NAME): $(OBJS) $(GNL_OBJS)
 	@$(LIBFT_MAKE) re
 	@$(CC) $(CFLAGS) $(OBJS_PATH)*.o $(GNL_OBJS_PATH)*.o $(LDFLAGS) $(LDLIBS) -o $(NAME)
 
+bonus: $(OBJS) $(GNL_OBJS)
+	@$(LIBFT_MAKE) re
+	@$(CC) $(CFLAGS) $(OBJS_PATH)*.o $(GNL_OBJS_PATH)*.o $(LDFLAGS) $(LDLIBS) -o $(NAME)
+
 # Pattern rule to compile .c files into .o files
 %.o: %.c
+	@$(CC) $(INCLUDE_SYS_HEADERS) $(INCLUDE_LIBFT) $(INCLUDE_GNL) -c $< -o $(OBJS_PATH)$@
+
+%.o: $(BONUS_PATH)%.c
 	@$(CC) $(INCLUDE_SYS_HEADERS) $(INCLUDE_LIBFT) $(INCLUDE_GNL) -c $< -o $(OBJS_PATH)$@
 
 %.o: $(GNL_PATH)%.c

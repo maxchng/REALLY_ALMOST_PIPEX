@@ -6,11 +6,11 @@
 /*   By: ychng <ychng@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/04 19:04:04 by ychng             #+#    #+#             */
-/*   Updated: 2023/11/09 17:05:01 by ychng            ###   ########.fr       */
+/*   Updated: 2023/11/09 17:06:26 by ychng            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "includes/pipex.h"
+#include "../includes/pipex_bonus.h"
 
 static void	free_cmd_tokens(char **cmd_tokens)
 {
@@ -32,6 +32,8 @@ void	process_cmd(int argc, char **argv, char **envp)
 	char	**cmd_tokens;
 
 	cmd_index = 1;
+	if (ft_strcmp(argv[1], "here_doc") == 0)
+		cmd_index++;
 	setup_pipe_fd(pipe_fd);
 	while (++cmd_index <= (argc - 2))
 	{
