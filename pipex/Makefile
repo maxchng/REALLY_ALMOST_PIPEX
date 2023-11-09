@@ -11,16 +11,15 @@ SRCS :=	pipex.c \
 		execute_cmd_1.c \
 		execute_cmd_2.c
 
+BONUS_SRCS :=	pipex_bonus.c \
+				process_cmd_bonus.c \
+				setup_functions_bonus.c \
+				tokenize_cmd_bonus.c \
+				execute_cmd_bonus_1.c \
+				execute_cmd_bonus_2.c
+
 GNL_SRCS :=	get_next_line.c \
 			get_next_line_utils.c
-
-# Object files
-OBJS := $(SRCS:.c=.o)
-GNL_OBJS := $(GNL_SRCS:.c=.o)
-
-# Compiler and flags
-CC := cc
-CFLAGS := -Wall -Werror -Wextra
 
 # Paths to different directory
 SYS_HEADERS_PATH := ../
@@ -29,6 +28,15 @@ OBJS_PATH := ./objs/
 BONUS_PATH := ./bonus/
 GNL_PATH := ../gnl/
 GNL_OBJS_PATH := ../gnl/objs/
+
+# Object files
+OBJS := $(addprefix $(OBJS_PATH), $(SRCS:.c=.o))
+BONUS_OBJS := $(addprefix $(OBJS_PATH), $(BONUS_SRCS:.c=.o))
+GNL_OBJS := $(addprefix $(GNL_OBJS_PATH), $(GNL_SRCS:.c=.o))
+
+# Compiler and flags
+CC := cc
+CFLAGS := -Wall -Werror -Wextra
 
 # Include path to header files
 INCLUDE_SYS_HEADERS := -I$(SYS_HEADERS_PATH)
@@ -50,30 +58,32 @@ RMFLAGS := -rf
 all: $(NAME)
 
 # Rule to build program
-$(NAME): $(OBJS) $(GNL_OBJS)
+$(NAME): $(OBJS)
+	@$(RM) $(RMFLAGS) $(BONUS_OBJS) $(GNL_OBJS)
 	@$(LIBFT_MAKE) re
-	@$(CC) $(CFLAGS) $(OBJS_PATH)*.o $(GNL_OBJS_PATH)*.o $(LDFLAGS) $(LDLIBS) -o $(NAME)
+	@$(CC) $(CFLAGS) $(OBJS) $(LDFLAGS) $(LDLIBS) -o $(NAME)
 
-bonus: $(OBJS) $(GNL_OBJS)
+bonus: $(BONUS_OBJS) $(GNL_OBJS)
+	@$(RM) $(RMFLAGS) $(OBJS)
 	@$(LIBFT_MAKE) re
-	@$(CC) $(CFLAGS) $(OBJS_PATH)*.o $(GNL_OBJS_PATH)*.o $(LDFLAGS) $(LDLIBS) -o $(NAME)
+	@$(CC) $(CFLAGS) $(BONUS_OBJS) $(GNL_OBJS) $(LDFLAGS) $(LDLIBS) -o $(NAME)
 
 # Pattern rule to compile .c files into .o files
-%.o: %.c
-	@$(CC) $(INCLUDE_SYS_HEADERS) $(INCLUDE_LIBFT) $(INCLUDE_GNL) -c $< -o $(OBJS_PATH)$@
+$(OBJS_PATH)%.o: %.c
+	@$(CC) $(INCLUDE_SYS_HEADERS) $(INCLUDE_LIBFT) -c $< -o $@
 
-%.o: $(BONUS_PATH)%.c
-	@$(CC) $(INCLUDE_SYS_HEADERS) $(INCLUDE_LIBFT) $(INCLUDE_GNL) -c $< -o $(OBJS_PATH)$@
+$(OBJS_PATH)%.o: $(BONUS_PATH)%.c
+	@$(CC) $(INCLUDE_SYS_HEADERS) $(INCLUDE_LIBFT) $(INCLUDE_GNL) -c $< -o $@
 
-%.o: $(GNL_PATH)%.c
-	@$(CC) $(INCLUDE_SYS_HEADERS) $(INCLUDE_GNL) -c $< -o $(GNL_OBJS_PATH)$@
+$(GNL_OBJS_PATH)%.o: $(GNL_PATH)%.c
+	@$(CC) $(INCLUDE_SYS_HEADERS) $(INCLUDE_GNL) -c $< -o $@
 
-# Remove all object files
+# Remove object files
 clean:
 	@$(LIBFT_MAKE) clean
-	@$(RM) $(RMFLAGS) $(OBJS_PATH)*.o $(GNL_OBJS_PATH)*.o
+	@$(RM) $(RMFLAGS) $(OBJS) $(BONUS_OBJS) $(GNL_OBJS)
 
-# Remove all generated files
+# Remove generated files
 fclean: clean
 	@$(LIBFT_MAKE) fclean
 	@$(RM) $(RMFLAGS) $(NAME)
@@ -82,4 +92,4 @@ fclean: clean
 re: fclean all
 
 # Phony targets
-.PHONY: all clean fclean re
+.PHONY: all bonus clean fclean re
