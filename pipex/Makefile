@@ -11,12 +11,12 @@ SRCS :=	pipex.c \
 		execute_cmd_1.c \
 		execute_cmd_2.c
 
-BONUS_SRCS :=	pipex_bonus.c \
-				process_cmd_bonus.c \
-				setup_functions_bonus.c \
-				tokenize_cmd_bonus.c \
-				execute_cmd_bonus_1.c \
-				execute_cmd_bonus_2.c
+BONUS_SRCS := pipex_bonus.c \
+			  process_cmd_bonus.c \
+			  setup_functions_bonus.c \
+			  tokenize_cmd_bonus.c \
+			  execute_cmd_bonus_1.c \
+			  execute_cmd_bonus_2.c
 
 GNL_SRCS :=	get_next_line.c \
 			get_next_line_utils.c
